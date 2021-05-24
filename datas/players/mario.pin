@@ -1,0 +1,8 @@
+right_idle player_09
+right_walk player_10 player_09 player_11
+left_idle player_12
+left_walk player_13 player_12 player_14
+up_idle player_24
+up_walk player_01 player_24 player_02
+down_idle player_21
+down_walk player_22 player_21 player_23

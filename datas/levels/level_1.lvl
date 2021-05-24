@@ -1,0 +1,24 @@
+name round1
+lh 8 8
+pp 4 4 down_idle datas/players/mario.pin
+
+ttn sol ground_05 2
+ttn mur block_03 5
+ttn caisse crate_44 18
+ttn caisse_ok crate_09 28
+ttn endpoint crate_29 33
+
+lg -1 -1 5 5 5 -1 -1 -1
+lg -1 -1 5 33 5 -1 -1 -1
+lg -1 -1 5 2 5 5 5 5
+lg 5 5 5 18 2 18 33 5
+lg 5 33 2 18 2 5 5 5
+lg 5 5 5 5 18 5 -1 -1
+lg -1 -1 -1 5 33 5 -1 -1
+lg -1 -1 -1 5 5 5 -1 -1
+
+
+
+
+
+

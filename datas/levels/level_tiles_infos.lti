@@ -1,0 +1,6 @@
+sol ground_03 ground_04 ground_05
+mur block_01 block_02 block_03 block_04 block_05 block_06 block_07 block_08
+caisse crate_02 crate_03 crate_04 crate_05 crate_06 crate_42 crate_43 crate_44 crate_45 crate_01
+caisse_ok crate_12 crate_13 crate_14 crate_15 crate_16 crate_07 crate_08 crate_09 crate_10 crate_11
+endpoint crate_27 crate_28 crate_29 crate_30 crate_31
+joueur player_03 player_21

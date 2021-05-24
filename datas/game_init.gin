@@ -1,0 +1,41 @@
+
+level initial datas/levels/levels_liste.lli
+player mario datas/players/mario.pin
+player mario_2 datas/players/mario_outline.pin
+
+texture path datas/textures/background
+texture add mario-550x365.jpg
+
+texture path datas/textures/blocks
+texture add block_01.png block_05.png block_02.png block_06.png
+texture add block_04.png block_08.png block_03.png block_07.png
+texture path datas/textures/crates
+texture add crate_01.png crate_06.png crate_11.png crate_16.png crate_21.png crate_26.png crate_31.png crate_36.png crate_41.png
+texture add crate_42.png crate_02.png crate_07.png crate_12.png crate_17.png crate_22.png crate_27.png crate_32.png crate_37.png
+texture add crate_43.png crate_03.png crate_08.png crate_13.png crate_18.png crate_23.png crate_28.png crate_33.png crate_38.png
+texture add crate_44.png crate_04.png crate_09.png crate_14.png crate_19.png crate_24.png crate_29.png crate_34.png crate_39.png
+texture add crate_45.png crate_05.png crate_10.png crate_15.png crate_20.png crate_25.png crate_30.png crate_35.png crate_40.png
+texture path datas/textures/environment
+texture add environment_01.png environment_02.png
+texture add environment_04.png environment_05.png
+texture add environment_07.png environment_08.png
+texture add environment_09.png environment_10.png
+texture add environment_13.png environment_14.png
+texture add environment_12.png environment_11.png
+texture add environment_15.png environment_16.png environment_03.png environment_06.png
+texture path datas/textures/ground
+texture add ground_03.png ground_06.png
+texture add ground_04.png ground_01.png
+texture add ground_05.png ground_02.png
+texture path datas/textures/player
+texture add player_18.png player_19.png player_20.png player_12.png player_13.png player_14.png
+texture add player_15.png player_16.png player_17.png player_09.png player_10.png player_11.png
+texture add player_06.png player_07.png player_08.png player_24.png player_01.png player_02.png
+texture add player_03.png player_04.png player_05.png player_21.png player_22.png player_23.png
+texture path datas/textures/hud
+texture add bt_blue_hover.png bt_blue_normal.png bt_green_active.png bt_green_hover.png bt_green_normal.png
+texture add bt_red_active.png bt_red_hover.png bt_red_normal.png left_fleche_active.png left_fleche_hover.png
+texture add left_fleche_normal.png right_fleche_active.png right_fleche_hover.png right_fleche_normal.png
+
+texture path datas/textures
+texture add playerFace.png playerFace_dark.png ret_74.png

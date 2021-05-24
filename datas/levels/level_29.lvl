@@ -1,0 +1,17 @@
+name level_29
+lh 7 9
+pp 6 1 down_idle datas/players/mario_outline.pin
+
+ttn mur block_03 5
+ttn sol ground_05 2
+ttn endpoint crate_29 33
+ttn caisse crate_44 18
+ttn caisse_ok crate_09 3
+
+lg -1 -1 -1 -1 -1 5 5 5 -1
+lg 5 5 5 5 5 5 2 5 5
+lg 5 2 2 2 2 33 28 2 5
+lg 5 2 2 2 5 2 2 2 5
+lg 5 5 5 5 5 18 5 2 5
+lg -1 -1 -1 -1 5 2 2 2 5
+lg -1 -1 -1 -1 5 5 5 5 5
