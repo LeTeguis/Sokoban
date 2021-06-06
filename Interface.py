@@ -20,6 +20,8 @@ class Bouton():
         self.border = 6
         self.border_radius = 12
 
+        self.load_sound()
+
     def set_font_size(self, size):
         self.fontsize = size
         self.font = pygame.font.SysFont("Showcard Gothic", self.fontsize)
@@ -28,6 +30,9 @@ class Bouton():
     def set_text(self, texte):
         self.text = texte
         self.text_image = self.font.render(self.text, True, (255, 255, 255))
+
+    def load_sound(self, click = 'datas/audios/220202__gameaudio__teleport-casual.wav'):
+        self.sound_click = pygame.mixer.Sound(click)
 
     def set_size(self, w, h, bd, bdr):
         self.rect.width = w
@@ -56,6 +61,7 @@ class Bouton():
                 if event.button == pygame.BUTTON_LEFT:
                     if self.is_enter(event.pos[0], event.pos[1]):
                         self.state = self.click_file
+                        self.sound_click.play()
             elif event.type == MOUSEBUTTONUP:
                 if self.state == self.click_file:
                     self.state = self.hover_file
@@ -104,6 +110,10 @@ class Selected_Bouton():
         self.selected = (0, 0, 0)
         self.state = self.normal
         self.is_selected = False
+        self.load_sound()
+
+    def load_sound(self, click = 'datas/audios/220203__gameaudio__casual-death-loose.wav'):
+        self.sound_click = pygame.mixer.Sound(click)
 
     def draw(self, screen):
         if self.state != self.normal:
@@ -137,6 +147,7 @@ class Selected_Bouton():
                         self.state = self.selected
                         self.is_selected = True
                         selection = True
+                    self.sound_click.play()
 
         elif event.type == MOUSEMOTION:
             if self.is_enter(event.pos[0], event.pos[1]):
@@ -242,10 +253,6 @@ class Fleche_Bouton():
                 self.add_value(-1)
                 self.value_change = True
 
-class Number_Selected():
-    def __init__(self):
-        pass
-
 class Menu_Level_Add():
     def __init__(self, parent):
         self.parent = parent
@@ -331,6 +338,11 @@ class Menu_Level_Add():
         self.choix_player = ""
 
         self.enregistrer = False
+
+        self.load_sound()
+
+    def load_sound(self, click = 'datas/audios/220210__gameaudio__bonk-click-w-deny-feel.wav'):
+        self.sound_click = pygame.mixer.Sound(click)
 
     def seof(self, string):
         return ((string).split("\n"))[0]
@@ -502,6 +514,7 @@ class Menu_Level_Add():
                 if validate:
                     indice, validate = self.value_of_element(self.type_actuel, self.selected_element_type)
                     if validate:
+                        self.sound_click.play()
                         a1, b1, c1 = self.get_name_by_value(indice)
                         if self.type[self.type_actuel] == "joueur":
                             self.x_player = x
@@ -534,6 +547,7 @@ class Menu_Level_Add():
                                 break_to = True
                                 break
                         if break_to:
+                            self.sound_click.play()
                             break
                     self.indice_sol = -1
                     for i in range(self.hauteur.value):
@@ -796,6 +810,81 @@ class Menu_Level_Add():
             if liste[i].is_selected :
                 self.selected_element_type = i
 
+class Menu_Credit():
+    def __init__(self, parent):
+        self.parent = parent
+        self.init_interface()
+
+    def init_interface(self):
+        self.bouton_home = Bouton("HOME", ftSize=30)
+        self.top_bouton()
+
+        self.text_information = []
+
+        fichier = open("datas/credits.txt", "r")
+        self.font = pygame.font.SysFont("Showcard Gothic", 16)
+        x, y = 0, 700-135
+        first = True
+        self.y_move = 0
+        self.finishe_move = False
+        while True:
+            ligne = fichier.readline()
+            if ligne != "":
+                if ligne[len(ligne) - 1] != '\n':
+                    ligne += "\n"
+                text = None
+
+                if first:
+                    text = self.font.render("\n"+ligne, True, (255, 242, 0))
+                    first = False
+                else:
+                    text = self.font.render("\n"+ligne, True, (255, 255, 255))
+                x = (1000 - text.get_rect().w)/2
+                y += text.get_rect().h + 10
+                self.hauteur_text = text.get_rect().h
+                self.text_information.append([text, [x, y]])
+
+                if ligne == "\n":
+                    first = True
+            else:
+                break
+
+    def top_bouton(self):
+        self.bouton_home.set_size(200, 50, bd=4, bdr=10)
+        self.bouton_home.set_position((1000 - self.bouton_home.rect.width)/2, 20)
+
+    def updateEvent(self, event):
+        self.bouton_home.updateEvent(event)
+
+        if self.bouton_home.is_click():
+            self.parent.state = self.parent.menu_principale
+            self.bouton_home.state = self.bouton_home.normal_file
+
+    def draw_rect_alpha(self, surface, color, rect, epaisseur = 0):
+        shape_surf = pygame.Surface(pygame.Rect(rect).size, pygame.SRCALPHA)
+        if epaisseur == 0:
+            pygame.draw.rect(shape_surf, color, shape_surf.get_rect())
+        else:
+            pygame.draw.rect(shape_surf, color, shape_surf.get_rect(), width=epaisseur)
+        surface.blit(shape_surf, rect)
+
+    def draw(self, screen):
+        pygame.draw.rect(screen, color=(0, 100, 100, 0), rect=(0, 0, 1000, self.bouton_home.rect.height + 40))
+        self.bouton_home.draw(screen)
+
+        self.draw_rect_alpha(screen, (0, 162, 232, 50), (50, 110, 900, 700-130), 0)
+        self.draw_rect_alpha(screen, (0, 68, 98, 255), (50, 110, 900, 700-130), 4)
+        for ligne in self.text_information:
+            if (ligne[1])[1] >= 112  and (ligne[1])[1] <= 750 - 100:
+                screen.blit(ligne[0], ((ligne[1])[0], (ligne[1])[1]))
+
+    def update(self, delta_time):
+        for ligne in self.text_information:
+            if (ligne[1])[1] - 0.3 >= 120:
+                (ligne[1])[1] -= 0.3
+            else:
+                break
+
 class LevelChoix():
     def __init__(self, parent):
         self.parent = parent
@@ -820,6 +909,10 @@ class LevelChoix():
         self.font = pygame.font.SysFont("Showcard Gothic", 30)
         self.titre_image = self.font.render(self.erreur_fichier, True, (220, 220, 220))
 
+        self.level_indiquation = self.font.render("Niveaux", True, (220, 220, 220))
+
+        self.play_sound = False
+
     def change_error(self, message):
         self.erreur_fichier = message
         self.titre_image = self.font.render(self.erreur_fichier, True, (200, 10, 10))
@@ -842,7 +935,6 @@ class LevelChoix():
             self.bouton_level[i] = [Bouton(str(i+1), ftSize=20), niveau, erreur]
 
         self.page_number = int(taille/(self.ligne_page*self.colone_page))
-
         if self.page_number == 0 and taille > 0:
             self.page_number = 1
             self.actual_page = 1
@@ -851,6 +943,9 @@ class LevelChoix():
             self.bouton_back.enable()
             self.bouton_next.enable()
 
+        self.got_page(self.actual_page)
+
+    def reload_info(self):
         self.got_page(self.actual_page)
 
     def got_page(self, position):
@@ -866,7 +961,7 @@ class LevelChoix():
         for i in range(self.ligne_page):
             for j in range(self.colone_page):
                 p_b = i * self.colone_page + j + ((self.actual_page-1) * self.ligne_page * self.colone_page)
-                if p_b >= len(self.bouton_level):
+                if p_b >= len(self.bouton_level) or p_b < 0:
                     break_to = True
                     break
                 bouton = self.bouton_level[p_b]
@@ -877,6 +972,7 @@ class LevelChoix():
                     bouton[0].normal_file = (0, 201, 252)
                     bouton[0].hover_file = (74, 214, 249)
                     bouton[0].click_file = (0, 187, 235)
+                    bouton[0].state = bouton[0].normal_file
                 prev_x += self.bouton_space + self.bouton_size_w
             if break_to:
                 break
@@ -884,6 +980,13 @@ class LevelChoix():
             prev_y += self.bouton_size_h + self.bouton_space
 
     def updateEvent(self, event):
+
+        if self.play_sound:
+            self.background_sound = pygame.mixer.music.load(
+                "datas/audios/mixkit-game-level-music.mp3")
+            pygame.mixer.music.set_volume(0.3)
+            pygame.mixer.music.play(-1)
+            self.play_sound = False
 
         if self.actual_page == 1:
             self.bouton_back.deseable()
@@ -919,6 +1022,7 @@ class LevelChoix():
                     else:
                         self.change_error("BIEN")
                         self.parent.state = bouton[1]
+                        self.parent.state.play_sound = True
                         bouton[0].state = bouton[0].normal_file
 
     def draw(self, screen):
@@ -928,7 +1032,9 @@ class LevelChoix():
         self.bouton_next.draw(screen)
 
         if self.erreur_fichier != "BIEN":
-            screen.blit(self.titre_image, ((1000 - self.titre_image.get_rect().width) / 2, 80))
+            screen.blit(self.titre_image, ((1000 - self.titre_image.get_rect().width) / 2 + self.titre_image.get_rect().width*2, 80))
+
+        screen.blit(self.level_indiquation, ((1000 - self.level_indiquation.get_rect().width) / 2, 75))
 
         for i in range(len(self.bouton_level)):
             bouton = self.bouton_level[i]
@@ -959,7 +1065,17 @@ class MenuPrincipal():
         self.font = pygame.font.SysFont("Showcard Gothic", 100)
         self.titre_image = self.font.render("S O K O G A P", True, (255, 255, 255))
 
+        #self.background_sound = pygame.mixer.music.load("datas/audios/ES_Glitching Through the Sky - William Benckert.mp3")
+        #pygame.mixer.music.play(-1)
+
+        self.play_sound = False
+
     def updateEvent(self, event):
+        if self.play_sound:
+            self.background_sound = pygame.mixer.music.load("datas/audios/mixkit-game-level-music.mp3")
+            pygame.mixer.music.set_volume(0.3)
+            pygame.mixer.music.play(-1)
+            self.play_sound = False
         self.bouton_play.updateEvent(event)
         self.bouton_create_level.updateEvent(event)
         self.bouton_credit.updateEvent(event)
@@ -970,7 +1086,9 @@ class MenuPrincipal():
             self.parent.state = self.parent.menu_choix_level
             self.bouton_play.state = self.bouton_play.normal_file
         if self.bouton_credit.is_click():
-            pass
+            self.parent.menu_credit.init_interface()
+            self.parent.state = self.parent.menu_credit
+            self.bouton_credit.state = self.bouton_credit.normal_file
         if self.bouton_quit.is_click():
             self.parent.game_running = False
         if self.bouton_create_level.is_click():
@@ -989,8 +1107,4 @@ class MenuPrincipal():
             screen.blit(texture, ((1000 - 128) / 2, 50))
 
     def update(self, delta_time):
-        pass
-
-class CreditInterface():
-    def __init__(self, parent):
         pass

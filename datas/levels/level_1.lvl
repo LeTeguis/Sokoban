@@ -1,4 +1,4 @@
-name round1
+name level_1
 lh 8 8
 pp 4 4 down_idle datas/players/mario.pin
 

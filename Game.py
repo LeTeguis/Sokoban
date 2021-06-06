@@ -17,14 +17,16 @@ class Game():
         self.menu_principale = Interface.MenuPrincipal(self)
         self.menu_choix_level = Interface.LevelChoix(self)
         self.menu_cajouter_level = Interface.Menu_Level_Add(self)
+        self.menu_credit = Interface.Menu_Credit(self)
         self.state = self.menu_principale
+        self.state.play_sound = True
         self.state_not_error = True
 
 
         #self.background_sound = pygame.mixer.music.load("datas/audios/African Safari Loop.wav")
-        self.background_sound = pygame.mixer.music.load("datas/audios/Blazer Rail 2.wav")
+        #self.background_sound = pygame.mixer.music.load("datas/audios/Blazer Rail 2.wav")
         #self.background_sound = pygame.mixer.music.load("datas/audios/Free Synthwave Loop.wav")
-        pygame.mixer.music.play(-1)
+        #pygame.mixer.music.play(-1)
     def loop(self):
         while self.game_running:
             self.event()

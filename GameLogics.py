@@ -3,6 +3,8 @@ class GameLogics():
     def __init__(self):
         self.load_info_logics()
     def load_info_logics(self):
+        self.put_end_point = False
+        self.out_end_point = False
         self.type_file = {}
         self.type = ["sol", "mur", "caisse", "caisse_ok", "endpoint", "joueur"]
         fichier = open("datas/levels/level_tiles_infos.lti", "r")
@@ -146,6 +148,7 @@ class GameLogics():
                                     return int(sol), int(map[int(yp + myp), int(xp + mxp)]), True
                                 if type_info_1 == "endpoint":
                                     val, caisse_ok_info, endpoint_ok_info = self.complement_caisse("caisse",map[int(yp + myp), int(xp + mxp)])
+                                    self.put_end_point = True
                                     if val and map[int(y), int(x)] == endpoint_ok_info[1]:
                                         return int(sol), int(caisse_ok_info[1]), True
                                     else:
@@ -156,18 +159,16 @@ class GameLogics():
                             if validate_1  and type_info_1 != "mur" and int(map[int(y), int(x)]) != -1:
                                 val, caisse_info, endpoint_ok_info = self.complement_caisse_ok("caisse_ok",map[int(yp + myp), int(xp + mxp)])
                                 if type_info_1 == "sol":
+                                    self.out_end_point = True
                                     return int(endpoint_ok_info[1]), int(caisse_info[1]), True
                                 if type_info_1 == "endpoint":
+                                    self.put_end_point = True
                                     if map[int(y), int(x)] == endpoint_ok_info[1]:
                                         return int(endpoint_ok_info[1]), int(map[int(yp + myp), int(xp + mxp)]), True
                                     else:
                                         return int(endpoint_ok_info[1]), int(caisse_info[1]), True
                     elif type_info == "endpoint" or type_info == "sol":
-                        #if val1:
-                        #   return map[int(yp + myp), int(xp + mxp)], map[int(y), int(x)], True
-                        #else:
-                            #return int(map[int(yp + myp), int(xp + mxp)]), int(-1), True
-                            return -1, -1, True
+                        return -1, -1, True
                     else:
                         pass
         return -1, -1, False

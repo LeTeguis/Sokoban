@@ -9,6 +9,7 @@ class Level():
     def __init__(self, path_level, finish, lvn, tln):
         self.path = path_level
         self.name = "default"
+        self.level_name = "default"
         self.ligne = 0
         self.colone = 0
         self.tileset = {}
@@ -19,6 +20,8 @@ class Level():
         self.level_all = tln
         self.parent = None
         self.sol_name = None
+
+        self.play_sound = False
 
     def load_level(self):
         fichier = open(self.path, "r")
@@ -31,6 +34,7 @@ class Level():
                 infos = ligne.split(" ")
                 if self.seof(infos[0]) == "name":
                     self.name = self.seof(infos[1])
+                    self.level_name = self.seof(infos[1])
                 elif self.seof(infos[0]) == "lh":
                     self.ligne, self.colone = int(self.seof(infos[1])), int(self.seof(infos[2]))
                     self.map = np.zeros(shape=(self.ligne, self.colone))
@@ -114,7 +118,7 @@ class Level():
                 self.liste_map_accumulation.append(self.map.copy())
                 self.liste_player_position.append([self.player.position_x, self.player.position_y])
                 self.actual_modif = 0
-                self.number_back_game = 5
+                self.number_back_game = 15
 
                 fini = "PAS FINI"
                 if self.is_finish:
@@ -127,16 +131,33 @@ class Level():
                 self.info_bulle.visible = False
                 self.info_bulle.set_position((1000 - self.info_bulle.rect.width) // 2, (700 - self.info_bulle.rect.height) // 2)
 
+                self.load_sound()
+        fichier.close()
     def seof(self, string):
         return ((string).split("\n"))[0]
 
     def is_win(self):
         return GameLogics.gameLogics.is_finish(lg = self.ligne, cl = self.colone, map = self.map, nature=self.tileset)
 
+    def load_sound(self, click = 'datas/audios/mixkit-medieval-show-fanfare-announcement-226.wav'):
+        self.sound_click = pygame.mixer.Sound(click)
+        self.sound_walk = pygame.mixer.Sound('datas/audios/mixkit-boxing-punch-2051.wav')
+        self.sound_hit = pygame.mixer.Sound('datas/audios/mixkit-boxer-getting-hit-2055.wav')
+        self.sound_complited = pygame.mixer.Sound('datas/audios/mixkit-unlock-new-item-game-notification-254.wav')
+        self.sound_complited_out = pygame.mixer.Sound('datas/audios/220208__gameaudio__click-pop-two-part.wav')
+        self.play_it = False
+
     def updateEvent(self, event):
         game_running = True
+
         if not self.map_error:
             if self.info_bulle.visible == False:
+                if self.play_sound:
+                    self.background_sound = pygame.mixer.music.load(
+                        "datas/audios/ES_Glitching Through the Sky - William Benckert.mp3")
+                    pygame.mixer.music.set_volume(0.3)
+                    pygame.mixer.music.play(-1)
+                    self.play_sound = False
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_ESCAPE:
                         game_running = False
@@ -184,8 +205,10 @@ class Level():
                 if self.precedent.is_click() and not (self.parent is None):
                     self.parent.state = self.parent.menu_choix_level
                     self.precedent.state = self.precedent.normal_file
+                    self.parent.state.play_sound = True
                 if self.home.is_click() and not (self.parent is None):
                     self.parent.state = self.parent.menu_principale
+                    self.parent.state.play_sound = True
                     self.home.state = self.home.normal_file
             else:
                 self.info_bulle.updateEvent(event)
@@ -202,6 +225,12 @@ class Level():
                     self.xmove = 0
                 self.n, self.n2, self.validate = GameLogics.gameLogics.logics_game(xp, yp, self.xmove, self.ymove, self.ligne, self.colone, self.map, self.indice_sol)
                 if self.validate:
+                    if GameLogics.gameLogics.put_end_point:
+                        GameLogics.gameLogics.put_end_point = False
+                        self.sound_complited.play()
+                    if GameLogics.gameLogics.out_end_point:
+                        GameLogics.gameLogics.out_end_point = False
+                        self.sound_complited_out.play()
                     if self.xmove != 0:
                         self.player.set_move(self.xmove, 0)
                         self.ymove = 0
@@ -210,8 +239,10 @@ class Level():
                         self.xmove = 0
                     self.x_mapUpdate = int(self.player.position_x)
                     self.y_mapUpdate = int(self.player.position_y)
+                    self.sound_walk.play()
                 else:
                     self.xmove, self.ymove = 0, 0
+                    self.sound_hit.play()
             now = pygame.time.get_ticks()
             if now - self.last_time > 150:
                 v2, f = self.player.animation()
@@ -240,7 +271,7 @@ class Level():
                             self.liste_player_position.remove(self.liste_player_position[0])
                             self.liste_map_accumulation.remove(self.liste_map_accumulation[0])
 
-                        print(self.actual_modif)
+                        #print(self.actual_modif)
 
                     self.xmove, self.ymove = 0, 0
                     self.validate = False
@@ -269,9 +300,16 @@ class Level():
 
             if self.is_win():
                 self.is_finish = True
+                levels.saved_loader(self.level_name, True)
+                levels.init_loader()
                 self.parent.menu_choix_level.got_page(self.parent.menu_choix_level.actual_page)
                 if self.player.isIdle():
                     self.info_bulle.visible = True
+                    if self.play_it == False:
+                        self.sound_click.play()
+                        self.play_it = True
+
+                        self.info_bulle.stop_sound = self.sound_click
 
             if self.info_bulle.visible:
                 self.info_bulle.draw_rect_alpha(screen, (0, 0, 0, 100), pygame.Rect(0, 0, 1000, 700))
@@ -307,6 +345,18 @@ class NextStape():
         self.set_position(0, 0)
 
         self.set_message("BRAVOS")
+
+        self.stop_sound = None
+
+        lv = self.num_level - 1
+        self.next_level, validate = levels.get_next_level2(lv)
+        if validate:
+            self.next_level.parent = self.parent
+            self.next_level.load_level()
+            if self.next_level.map_error:
+                self.next.deseable()
+        else:
+            self.next.deseable()
 
     def set_message(self, string):
         self.message = str(string)
@@ -354,16 +404,16 @@ class NextStape():
                 self.home.state = self.home.normal_file
                 self.visible = False
 
+                if self.stop_sound != None:
+                    self.stop_sound.stop()
             if self.next.is_click():
-                lv = self.num_level - 1
-                value, validate = levels.get_next_level2(lv)
-                if validate:
-                    self.visible = False
-                    value.parent = self.parent
-                    value.load_level()
-                    self.parent.menu_choix_level.got_page(self.parent.menu_choix_level.actual_page)
-                    self.parent.state = value
-                    self.next.state = self.next.normal_file
+                self.visible = False
+                self.parent.menu_choix_level.got_page(self.parent.menu_choix_level.actual_page)
+                self.parent.state = self.next_level
+                self.next.state = self.next.normal_file
+
+                if self.stop_sound != None:
+                    self.stop_sound.stop()
 
             if self.recommencer.is_click():
                 self.parent.menu_choix_level.got_page(self.parent.menu_choix_level.actual_page)
@@ -372,6 +422,9 @@ class NextStape():
                 self.this_level.parent = p
                 self.this_level.load_level()
                 self.recommencer.state = self.recommencer.normal_file
+
+                if self.stop_sound != None:
+                    self.stop_sound.stop()
 
 class Levels():
     def __init__(self):
@@ -388,15 +441,30 @@ class Levels():
                 if ligne != "":
                     infos = ligne.split(" ")
                     identifiant = [self.seof(infos[1])]
-                    if self.seof(infos[2]) == "false":
+                    if str.upper(self.seof(infos[2])) == "FALSE":
                         identifiant.append(False)
-                    elif self.seof(infos[2]) == "true":
+                    elif str.upper(self.seof(infos[2])) == "TRUE":
                         identifiant.append(True)
                     else:
                         identifiant.append(False)
                     self.levels[self.seof(infos[0])] = identifiant
                 else:
                     break
+            fichier.close()
+
+    def saved_loader(self, name, finish):
+        if self.not_error:
+            if name in self.levels.keys():
+                (self.levels[name])[1] = finish
+                fichier = open(self.path, "w")
+                for element in self.levels.keys():
+                    validation = "True"
+                    if (self.levels[element])[1] == False:
+                        validation = "False"
+                    fichier.write(element+" "+(self.levels[element])[0]+" "+validation+"\n")
+                fichier.close()
+            else:
+                pass
 
     def seof(self, string):
         return ((string).split("\n"))[0]
