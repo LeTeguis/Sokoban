@@ -12,11 +12,16 @@ class LoadData():
         while True:
             ligne = fichier.readline()
             if ligne != "":
-                infos = ligne.split(" ")
-                if self.seof(infos[0]) == "texture":
-                    texture_path = self.loadTexture(ligne, texture_path)
-                elif self.seof(infos[0]) == "level":
-                    self.levels_path[self.seof(infos[1])] = self.seof(infos[2])
+                if ligne != "\n":
+                    infos_copy = ligne.split(" ")
+                    infos = []
+                    for value in infos_copy:
+                        if value != "":
+                            infos.append(value)
+                    if self.seof(infos[0]) == "texture":
+                        texture_path = self.loadTexture(ligne, texture_path)
+                    elif self.seof(infos[0]) == "level":
+                        self.levels_path[self.seof(infos[1])] = self.seof(infos[2])
             else:
                 break
 
@@ -28,7 +33,11 @@ class LoadData():
         self.player_infos[self.seof(infos[1])] = self.seof(infos[2])
 
     def loadTexture(self, ligne, path):
-        infos = ligne.split(" ")
+        infos_copy = ligne.split(" ")
+        infos = []
+        for value in infos_copy:
+            if value != "":
+                infos.append(value)
         if self.seof(infos[1]) == "path" and len(infos) == 3:
             return self.seof(infos[2])
         elif self.seof(infos[1]) == "add":

@@ -31,36 +31,41 @@ class Level():
         while True:
             ligne = fichier.readline()
             if ligne != "":
-                infos = ligne.split(" ")
-                if self.seof(infos[0]) == "name":
-                    self.name = self.seof(infos[1])
-                    self.level_name = self.seof(infos[1])
-                elif self.seof(infos[0]) == "lh":
-                    self.ligne, self.colone = int(self.seof(infos[1])), int(self.seof(infos[2]))
-                    self.map = np.zeros(shape=(self.ligne, self.colone))
-                elif self.seof(infos[0]) == "pp":
-                    x, y = int(self.seof(infos[1])), int(self.seof(infos[2]))
-                    action, player_pack = self.seof(infos[3]), self.seof(infos[4])
-                    self.player = Player.Player(x, y, player_pack, action)
-                elif self.seof(infos[0]) == "ttn":
-                    if self.seof(infos[1]) not in self.tileset:
-                        self.tileset[self.seof(infos[1])] = {}
-                    value = self.tileset[self.seof(infos[1])]
-                    value[self.seof(infos[2])] = self.seof(infos[3])
+                if ligne != "\n":
+                    infos_copy = ligne.split(" ")
+                    infos = []
+                    for value in infos_copy:
+                        if value != "":
+                            infos.append(value)
+                    if self.seof(infos[0]) == "name":
+                        self.name = self.seof(infos[1])
+                        self.level_name = self.seof(infos[1])
+                    elif self.seof(infos[0]) == "lh":
+                        self.ligne, self.colone = int(self.seof(infos[1])), int(self.seof(infos[2]))
+                        self.map = np.zeros(shape=(self.ligne, self.colone))
+                    elif self.seof(infos[0]) == "pp":
+                        x, y = int(self.seof(infos[1])), int(self.seof(infos[2]))
+                        action, player_pack = self.seof(infos[3]), self.seof(infos[4])
+                        self.player = Player.Player(x, y, player_pack, action)
+                    elif self.seof(infos[0]) == "ttn":
+                        if self.seof(infos[1]) not in self.tileset:
+                            self.tileset[self.seof(infos[1])] = {}
+                        value = self.tileset[self.seof(infos[1])]
+                        value[self.seof(infos[2])] = self.seof(infos[3])
 
-                    if self.seof(infos[1]) == "sol":
-                        self.indice_sol = self.seof(infos[3])
-                        self.sol_name = self.seof(infos[2])
+                        if self.seof(infos[1]) == "sol":
+                            self.indice_sol = self.seof(infos[3])
+                            self.sol_name = self.seof(infos[2])
 
-                elif self.seof(infos[0]) == "lg":
-                    if len(infos) - 1 == self.colone:
-                        for i in range(len(infos) - 1):
-                            self.map[ligne_map, i] = int(self.seof(infos[i + 1]))
-                        ligne_map += 1
-                    else:
+                    elif self.seof(infos[0]) == "lg":
+                        if len(infos) - 1 == self.colone:
+                            for i in range(len(infos) - 1):
+                                self.map[ligne_map, i] = int(self.seof(infos[i + 1]))
+                            ligne_map += 1
+                        else:
+                            self.map_error = True
+                    elif ligne != "\n":
                         self.map_error = True
-                elif ligne != "\n":
-                    self.map_error = True
             else:
                 break
 
@@ -203,6 +208,7 @@ class Level():
                             self.redo.deseable()
 
                 if self.precedent.is_click() and not (self.parent is None):
+                    levels.init_loader()
                     self.parent.state = self.parent.menu_choix_level
                     self.precedent.state = self.precedent.normal_file
                     self.parent.state.play_sound = True
@@ -439,15 +445,20 @@ class Levels():
             while True:
                 ligne = fichier.readline()
                 if ligne != "":
-                    infos = ligne.split(" ")
-                    identifiant = [self.seof(infos[1])]
-                    if str.upper(self.seof(infos[2])) == "FALSE":
-                        identifiant.append(False)
-                    elif str.upper(self.seof(infos[2])) == "TRUE":
-                        identifiant.append(True)
-                    else:
-                        identifiant.append(False)
-                    self.levels[self.seof(infos[0])] = identifiant
+                    if ligne != "\n":
+                        infos_copy = ligne.split(" ")
+                        infos = []
+                        for value in infos_copy:
+                            if value != "":
+                                infos.append(value)
+                        identifiant = [self.seof(infos[1])]
+                        if str.upper(self.seof(infos[2])) == "FALSE":
+                            identifiant.append(False)
+                        elif str.upper(self.seof(infos[2])) == "TRUE":
+                            identifiant.append(True)
+                        else:
+                            identifiant.append(False)
+                        self.levels[self.seof(infos[0])] = identifiant
                 else:
                     break
             fichier.close()

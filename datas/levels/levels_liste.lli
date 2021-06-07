@@ -1,4 +1,4 @@
-level_1 datas/levels/level_1.lvl False
+level_1 datas/levels/level_1.lvl True
 level_2 datas/levels/level_2.lvl False
 level_3 datas/levels/level_3.lvl False
 level_4 datas/levels/level_4.lvl False
@@ -27,3 +27,4 @@ level_26 datas/levels/level_26.lvl False
 level_27 datas/levels/level_27.lvl False
 level_28 datas/levels/level_28.lvl False
 level_29 datas/levels/level_29.lvl False
+level_30 datas/levels/level_30.lvl True

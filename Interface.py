@@ -283,21 +283,26 @@ class Menu_Level_Add():
         while True:
             ligne = fichier.readline()
             if ligne != "":
-                infos = ligne.split(" ")
-                ajouter = False
-                for i in range(len(self.type)):
-                    if self.type[i] == self.seof(infos[0]):
-                        ajouter = True
-                        break
+                if ligne != "\n":
+                    infos_copy = ligne.split(" ")
+                    infos = []
+                    for value in infos_copy:
+                        if value != "":
+                            infos.append(value)
+                    ajouter = False
+                    for i in range(len(self.type)):
+                        if self.type[i] == self.seof(infos[0]):
+                            ajouter = True
+                            break
 
-                if ajouter:
-                    if not self.seof(infos[0]) in self.type_file:
-                        self.type_file[self.seof(infos[0])] = []
-                    liste = self.type_file[self.seof(infos[0])]
-                    for i in range(len(infos) - 1):
-                        bouton = Selected_Bouton(self.seof(infos[i + 1]))
-                        liste.append(bouton)
-                    #self.type_file[self.seof(infos[0])] = liste
+                    if ajouter:
+                        if not self.seof(infos[0]) in self.type_file:
+                            self.type_file[self.seof(infos[0])] = []
+                        liste = self.type_file[self.seof(infos[0])]
+                        for i in range(len(infos) - 1):
+                            bouton = Selected_Bouton(self.seof(infos[i + 1]))
+                            liste.append(bouton)
+                        #self.type_file[self.seof(infos[0])] = liste
             else:
                 break
 
@@ -574,14 +579,10 @@ class Menu_Level_Add():
             self.parent.state = self.parent.menu_principale
             self.home.state = self.home.normal_file
             self.enregistrer = False
+            self.clean_creation(True)
 
         if self.clear_map.is_click():
-            for i in range(self.hauteur.value):
-                for j in range(self.largeur.value):
-                    self.map[i, j] = -1
-            self.save.deseable()
-            self.nouveau.deseable()
-            self.enregistrer = False
+            self.clean_creation()
 
         if self.save.is_click():
             self.enregistrer = True
@@ -708,15 +709,27 @@ class Menu_Level_Add():
                 pass
 
         if self.nouveau.is_click():
-            for i in range(self.hauteur.value):
-                for j in range(self.largeur.value):
-                    self.map[i, j] = -1
-            self.save.deseable()
-            self.nouveau.deseable()
+            self.clean_creation()
 
-            self.level_name = "level_"+str(Levels.levels.get_size() + 1)
-            self.deja_enregistre = False
-            self.enregistrer = False
+    def clean_creation(self, reset_size = False):
+        for i in range(self.hauteur.value):
+            for j in range(self.largeur.value):
+                self.map[i, j] = -1
+        self.save.deseable()
+        self.nouveau.deseable()
+
+        self.level_name = "level_" + str(Levels.levels.get_size() + 1)
+        self.deja_enregistre = False
+        self.enregistrer = False
+
+        if reset_size:
+            self.largeur.set_max_value(self.largeur_dessin // 32)
+            self.largeur.set_min_value(self.largeur_dessin // 64)
+            self.largeur.set_value(self.largeur.min_value)
+            self.dimenssion = self.largeur_dessin // self.largeur.min_value
+            self.hauteur.set_max_value(self.hauteur_dessin // 32)
+            self.hauteur.set_min_value(self.hauteur_dessin // 64)
+            self.hauteur.set_value(self.hauteur_dessin // self.dimenssion)
 
 
     def is_enter(self, x, y):
@@ -830,22 +843,25 @@ class Menu_Credit():
         while True:
             ligne = fichier.readline()
             if ligne != "":
-                if ligne[len(ligne) - 1] != '\n':
-                    ligne += "\n"
-                text = None
-
-                if first:
-                    text = self.font.render("\n"+ligne, True, (255, 242, 0))
-                    first = False
+                if ligne != "\n":
+                    lignes = ligne.split("\n")
+                    ligne = ""
+                    for value in lignes:
+                        if value != "":
+                            ligne += value
+                    if first:
+                        #text = self.font.render(ligne, True, (0, 0, 0))
+                        text = self.font.render(ligne, True, (255, 242, 0))
+                        first = False
+                    else:
+                        text = self.font.render(ligne, True, (255, 255, 255))
+                    x = (1000 - text.get_rect().w)/2
+                    y += text.get_rect().h + 10
+                    self.hauteur_text = text.get_rect().h
+                    self.text_information.append([text, [x, y]])
                 else:
-                    text = self.font.render("\n"+ligne, True, (255, 255, 255))
-                x = (1000 - text.get_rect().w)/2
-                y += text.get_rect().h + 10
-                self.hauteur_text = text.get_rect().h
-                self.text_information.append([text, [x, y]])
-
-                if ligne == "\n":
                     first = True
+                    y += 15
             else:
                 break
 
@@ -1093,6 +1109,7 @@ class MenuPrincipal():
             self.parent.game_running = False
         if self.bouton_create_level.is_click():
             self.parent.state = self.parent.menu_cajouter_level
+            self.parent.state.clean_creation(True)
             self.bouton_create_level.state = self.bouton_create_level.normal_file
 
     def draw(self, screen):
@@ -1104,7 +1121,7 @@ class MenuPrincipal():
 
         texture, validate = LoadData.loadData.get_texture("playerFace_dark")
         if validate:
-            screen.blit(texture, ((1000 - 128) / 2, 50))
+            screen.blit(texture, ((1000 - 128) / 2 - 6, 50))
 
     def update(self, delta_time):
         pass
